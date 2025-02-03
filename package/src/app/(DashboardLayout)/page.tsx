@@ -9,6 +9,7 @@ import RecentTransactions from '@/app/(DashboardLayout)/components/dashboard/Rec
 import ProductPerformance from '@/app/(DashboardLayout)/components/dashboard/ProductPerformance';
 import Blog from '@/app/(DashboardLayout)/components/dashboard/Blog';
 import MonthlyEarnings from '@/app/(DashboardLayout)/components/dashboard/MonthlyEarnings';
+import TodayTraffic from '@/app/(DashboardLayout)/components/dashboard/TodayTraffic';
 import {useEffect} from "react";
 
 const Dashboard = () => {
@@ -39,7 +40,7 @@ const Dashboard = () => {
               </Grid>
               <Grid item xs={12}>
                 {/*3*/}
-                <MonthlyEarnings />
+                <TodayTraffic />
               </Grid>
             </Grid>
           </Grid>

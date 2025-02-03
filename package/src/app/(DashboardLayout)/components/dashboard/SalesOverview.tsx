@@ -35,7 +35,20 @@ const monthOptions = getLast12Months();
 const fetchChartData = async (selectedMonth: string): Promise<{ categories: string[]; series: any[] }> => {
     try {
         // 尝试发送请求到后端接口
-        const response = await fetch(`/api/chart?month=${selectedMonth}`);
+        // const response = await fetch(`/api/chart?month=${selectedMonth}`);
+
+        const response = {
+            ok: true,
+            statusText: "Network response was not ok",
+            json: async () => ({
+                categories: ["08/2023", "09/2023", "10/2023", "11/2023", "12/2023", "01/2024", "02/2024"],
+                series: [
+                    { name: 'Logins', data: [1, 1, 1, 1, 1, 1, 1] },
+                    { name: 'Searchings', data: [420, 430, 440, 450, 460, 470, 480] },
+                ],
+            }),
+        };
+
         if (!response.ok) {
             throw new Error(`Network response was not ok: ${response.statusText}`);
         }
