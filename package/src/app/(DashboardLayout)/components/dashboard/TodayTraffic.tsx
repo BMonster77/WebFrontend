@@ -1,10 +1,10 @@
 import dynamic from "next/dynamic";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
-import { useTheme } from '@mui/material/styles';
 import { Stack, Typography, Avatar, Fab } from '@mui/material';
-import { IconArrowUpRight, IconTrafficLights } from '@tabler/icons-react';
+import { IconArrowUpRight, IconArrowDownRight, IconTrafficLights } from '@tabler/icons-react';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import { useEffect, useState } from 'react';
+import { useTheme } from "@mui/material/styles";
 
 // 你需要根据后端实际接口调整 URL
 const TodayTraffic = () => {
@@ -19,22 +19,24 @@ const TodayTraffic = () => {
         try {
             // 假设你后端接口返回的数据格式是这样的
             // const response = await fetch('/api/traffic');
-
             // const data = await response.json();
 
             const response = {
                 todayTraffic: 1230,
-                yesterdayTraffic: 1120,
-                growthPercentage: 10,
+                yesterdayTraffic: 1400,
                 trafficData7Days: [100, 200, 150, 300, 250, 500, 600], // 模拟近7日流量数据
-            }
+            };
 
             const data = response;
 
             // 更新状态
             setTodayTraffic(data.todayTraffic);
             setYesterdayTraffic(data.yesterdayTraffic);
-            setGrowthPercentage(data.growthPercentage);
+            setGrowthPercentage(
+                parseFloat(
+                    (((data.todayTraffic - data.yesterdayTraffic) / data.yesterdayTraffic) * 100).toFixed(1)
+                )
+            );
             setTrafficData7Days(data.trafficData7Days);
         } catch (error) {
             console.error("Error fetching traffic data:", error);
@@ -47,7 +49,12 @@ const TodayTraffic = () => {
     }, []); // 只在组件加载时触发一次请求
 
     // 如果数据还在加载中，展示加载状态
-    if (todayTraffic === null || yesterdayTraffic === null || growthPercentage === null || trafficData7Days.length === 0) {
+    if (
+        todayTraffic === null ||
+        yesterdayTraffic === null ||
+        growthPercentage === null ||
+        trafficData7Days.length === 0
+    ) {
         return <div>Loading...</div>;
     }
 
@@ -56,6 +63,8 @@ const TodayTraffic = () => {
     const secondary = theme.palette.secondary.main;
     const secondarylight = '#f5fcff';
     const successlight = '#e1f5e0';
+    // 如果增长为负，则使用错误色背景
+    const errorlight = '#ffebee';
 
     // chart 配置
     const optionscolumnchart: any = {
@@ -101,7 +110,7 @@ const TodayTraffic = () => {
         <DashboardCard
             title="Daily Pageviews"
             action={
-                <Fab color="secondary" size="medium" sx={{color: '#ffffff'}}>
+                <Fab color="secondary" size="medium" sx={{ color: '#ffffff' }}>
                     <IconTrafficLights width={24} />
                 </Fab>
             }
@@ -114,11 +123,21 @@ const TodayTraffic = () => {
                     {todayTraffic} {/* 显示今日浏览量 */}
                 </Typography>
                 <Stack direction="row" spacing={1} my={1} alignItems="center">
-                    <Avatar sx={{ bgcolor: successlight, width: 27, height: 27 }}>
-                        <IconArrowUpRight width={20} color="#4CAF50" />
+                    <Avatar
+                        sx={{
+                            bgcolor: growthPercentage >= 0 ? successlight : errorlight,
+                            width: 27,
+                            height: 27
+                        }}
+                    >
+                        {growthPercentage >= 0 ? (
+                            <IconArrowUpRight width={20} color="#4CAF50" />
+                        ) : (
+                            <IconArrowDownRight width={20} color="#F44336" />
+                        )}
                     </Avatar>
                     <Typography variant="subtitle2" fontWeight="600">
-                        {growthPercentage}% {/* 显示增长百分比 */}
+                        {growthPercentage}% {/* 显示增长或下降的百分比 */}
                     </Typography>
                     <Typography variant="subtitle2" color="textSecondary">
                         compared to yesterday

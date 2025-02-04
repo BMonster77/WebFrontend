@@ -54,7 +54,7 @@ const Dashboard = () => {
           </Grid>
           <Grid item xs={12}>
             {/*6*/}
-            <Blog />
+            {/*<Blog />*/}
           </Grid>
         </Grid>
       </Box>

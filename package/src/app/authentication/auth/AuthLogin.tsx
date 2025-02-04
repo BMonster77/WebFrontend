@@ -45,27 +45,27 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
     try {
       // const response = await axios.post("/api/login", { username, password });
 
-      const response = await axios.post(
-          'http://localhost:8080/administrator/login',
-          {
-            username,
-            password,
-          },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          }
-      );
+      // const response = await axios.post(
+      //     'http://localhost:8080/administrator/login',
+      //     {
+      //       username,
+      //       password,
+      //     },
+      //     {
+      //       headers: {
+      //         'Content-Type': 'application/json',
+      //       },
+      //     }
+      // );
 
       // 模拟一个响应对象（测试用）
-      // const response = {
-      //   data: {
-      //     success: true,               // 或者改为 false 测试失败情况
-      //     redirectUrl: "/",   // 登录成功后跳转的地址
-      //     message: "Invalid username or password." // 如果失败时返回的消息
-      //   }
-      // };
+      const response = {
+        data: {
+          success: true,               // 或者改为 false 测试失败情况
+          redirectUrl: "/",   // 登录成功后跳转的地址
+          message: "Invalid username or password." // 如果失败时返回的消息
+        }
+      };
 
       if (response.data.success) {
         // 登录成功后：
