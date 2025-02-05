@@ -1,7 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Typography, Grid, CardContent, Button, Stack } from '@mui/material';
+import {
+  Typography,
+  Grid,
+  CardContent,
+  Button,
+  Stack,
+  TextField
+} from '@mui/material';
 import PageContainer from '@/app/(DashboardLayout)/components/container/PageContainer';
 import DashboardCard from '@/app/(DashboardLayout)/components/shared/DashboardCard';
 import BlankCard from '@/app/(DashboardLayout)/components/shared/BlankCard';
@@ -15,6 +22,7 @@ interface User {
 
 const TypographyPage = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   // 模拟获取所有用户数据的接口
   useEffect(() => {
@@ -48,18 +56,35 @@ const TypographyPage = () => {
     alert(`Change password for user ${userId}`);
   };
 
+  // 根据搜索条件过滤用户列表
+  const filteredUsers = searchQuery.trim()
+      ? users.filter((user) => user.id === Number(searchQuery))
+      : users;
+
   return (
       <PageContainer title="Users" description="Manage all users">
         <Grid container spacing={3}>
           <Grid item xs={12}>
+            {/* 添加搜索框 */}
+            <TextField
+                label="Search by User ID"
+                variant="outlined"
+                type="number"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                fullWidth
+                margin="normal"
+            />
+          </Grid>
+          <Grid item xs={12}>
             <DashboardCard title="Users">
               <Grid container spacing={3}>
-                {users.length === 0 ? (
+                {filteredUsers.length === 0 ? (
                     <Grid item xs={12}>
                       <Typography variant="body1">No users found.</Typography>
                     </Grid>
                 ) : (
-                    users.map((user) => (
+                    filteredUsers.map((user) => (
                         <Grid item xs={12} md={6} key={user.id}>
                           <BlankCard>
                             <CardContent>
