@@ -43,61 +43,37 @@ const AuthLogin = ({ title, subtitle, subtext }: loginType) => {
     e.preventDefault();
 
     try {
-      // const response = await axios.post("/api/login", { username, password });
-
-      // const response = await axios.post(
-      //     'http://localhost:8080/administrator/login',
-      //     {
-      //       username,
-      //       password,
-      //     },
-      //     {
-      //       headers: {
-      //         'Content-Type': 'application/json',
-      //       },
-      //     }
-      // );
-
-      // 模拟一个响应对象（测试用）
-      const response = {
-        data: {
-          success: true,               // 或者改为 false 测试失败情况
-          redirectUrl: "/",   // 登录成功后跳转的地址
-          message: "Invalid username or password." // 如果失败时返回的消息
-        }
-      };
+      const response = await axios.post(
+          "http://localhost:5000/api/admin/login",
+          { username, password },
+          { headers: { "Content-Type": "application/json" } }
+      );
 
       if (response.data.success) {
-        // 登录成功后：
-        // 1. 在前端通过 sessionStorage 保存管理员登录状态
         sessionStorage.setItem(
             "adminSession",
-            JSON.stringify({
-              username: username,
-              loginTime: Date.now()
-            })
+            JSON.stringify({ username, loginTime: Date.now() })
         );
 
+        window.location.href = response.data.redirectUrl;
 
-        // 登录成功后，根据后端返回的 URL 跳转
-        window.location.href = response.data.redirectUrl;  // 可修改跳转页面
-
-        // 如果选择记住设备，存储用户名和密码到 localStorage
         if (rememberMe) {
           localStorage.setItem("username", username);
           localStorage.setItem("password", password);
         } else {
-          // 如果不选择，清除 localStorage 中存储的用户名和密码
           localStorage.removeItem("username");
           localStorage.removeItem("password");
         }
-      } else {
-        setError(response.data.message || "Login failed. Please try again.");
       }
-    } catch (err) {
-      setError("An error occurred. Please try again.");
+    } catch (err:any) {
+      if (err.response && err.response.data && err.response.data.message) {
+        setError(err.response.data.message); // Display the exact error message from the backend
+      } else {
+        setError("An error occurred. Please try again.");
+      }
     }
   };
+
 
   return (
       <>

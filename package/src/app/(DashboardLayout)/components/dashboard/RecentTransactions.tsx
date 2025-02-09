@@ -10,12 +10,13 @@ import {
     TimelineContent,
     timelineOppositeContentClasses,
 } from '@mui/lab';
-import { Link, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 
 // 定义接口返回的数据类型
 type Transaction = {
     time: string;
-    content: string;
+    context: string;
+    username: string;
 };
 
 const RecentTransactions = () => {
@@ -23,31 +24,38 @@ const RecentTransactions = () => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);  // 加载状态
 
+    // 辅助函数：格式化时间
+    // 如果是当天的时间，仅显示 HH:mm:ss，否则仅显示 YYYY/MM/DD
+    const formatTransactionTime = (timestamp: string) => {
+        const date = new Date(timestamp);
+        const now = new Date();
+
+        // 判断年份、月份和日期是否相同
+        if (
+            date.getFullYear() === now.getFullYear() &&
+            date.getMonth() === now.getMonth() &&
+            date.getDate() === now.getDate()
+        ) {
+            // 返回时间部分
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${hours}:${minutes}:${seconds}`;
+        } else {
+            // 返回日期部分，格式为 YYYY/MM/DD
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}/${month}/${day}`;
+        }
+    };
+
     // 请求后端接口并获取数据
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                // const response = await fetch('/api/transactions'); // 替换成你的实际 API 地址
-                // const data = await response.json();
-
-                const data = [
-                    { time: '09:30 am', content: 'Payment received from John Doe of $385.90' },
-                    { time: '10:00 am', content: 'Payment received from Jane Doe of $245.30' },
-                    { time: '11:15 am', content: 'Payment received from James Smith of $500.00' },
-                    { time: '12:45 pm', content: 'Payment received from Mary Johnson of $120.50' },
-                    { time: '02:30 pm', content: 'Payment received from Michael Brown of $320.80' },
-                    { time: '09:30 am', content: 'Payment received from John Doe of $385.90' },
-                    { time: '10:00 am', content: 'Payment received from Jane Doe of $245.30' },
-                    { time: '11:15 am', content: 'Payment received from James Smith of $500.00' },
-                    { time: '12:45 pm', content: 'Payment received from Mary Johnson of $120.50' },
-                    { time: '02:30 pm', content: 'Payment received from Michael Brown of $320.80' },
-                    { time: '09:30 am', content: 'Payment received from John Doe of $385.90' },
-                    { time: '10:00 am', content: 'Payment received from Jane Doe of $245.30' },
-                    { time: '11:15 am', content: 'Payment received from James Smith of $500.00' },
-                    { time: '12:45 pm', content: 'Payment received from Mary Johnson of $120.50' },
-                    { time: '02:30 pm', content: 'Payment received from Michael Brown of $320.80' },
-                ];
-
+                const response = await fetch('http://localhost:5000/api/feedback/getAllFeedbacks'); // 替换成你的实际 API 地址
+                const data = await response.json();
                 setTransactions(data);  // 将数据存入 state
             } catch (error) {
                 console.error('Failed to fetch transactions:', error);
@@ -95,7 +103,9 @@ const RecentTransactions = () => {
             >
                 {transactions.map((transaction, index) => (
                     <TimelineItem key={index}>
-                        <TimelineOppositeContent>{transaction.time}</TimelineOppositeContent>
+                        <TimelineOppositeContent>
+                            {formatTransactionTime(transaction.time)}
+                        </TimelineOppositeContent>
                         <TimelineSeparator>
                             <TimelineDot color="primary" variant="outlined" />
                             <TimelineConnector />
@@ -111,7 +121,9 @@ const RecentTransactions = () => {
                                 'scrollbar-width': 'none',  // 对 Firefox 兼容
                             }}
                         >
-                            {transaction.content}
+                            <Typography variant="body2">
+                                <strong>{transaction.username}</strong>: {transaction.context}
+                            </Typography>
                         </TimelineContent>
                     </TimelineItem>
                 ))}

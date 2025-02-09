@@ -9,8 +9,8 @@ import { useTheme } from "@mui/material/styles";
 // 你需要根据后端实际接口调整 URL
 const TodayTraffic = () => {
     // 状态
-    const [todayTraffic, setTodayTraffic] = useState<number | null>(null);
-    const [yesterdayTraffic, setYesterdayTraffic] = useState<number | null>(null);
+    const [todayLogin, setTodayLogin] = useState<number | null>(null);
+    const [yesterdayLogin, setYesterdayLogin] = useState<number | null>(null);
     const [growthPercentage, setGrowthPercentage] = useState<number | null>(null);
     const [trafficData7Days, setTrafficData7Days] = useState<number[]>([]);
 
@@ -18,26 +18,18 @@ const TodayTraffic = () => {
     const fetchTrafficData = async () => {
         try {
             // 假设你后端接口返回的数据格式是这样的
-            // const response = await fetch('/api/traffic');
-            // const data = await response.json();
-
-            const response = {
-                todayTraffic: 1230,
-                yesterdayTraffic: 1400,
-                trafficData7Days: [100, 200, 150, 300, 250, 500, 600], // 模拟近7日流量数据
-            };
-
-            const data = response;
+            const response = await fetch('http://localhost:5000/api/loginStats');
+            const data = await response.json();
 
             // 更新状态
-            setTodayTraffic(data.todayTraffic);
-            setYesterdayTraffic(data.yesterdayTraffic);
+            setTodayLogin(data.todayLogin);
+            setYesterdayLogin(data.yesterdayLogin);
             setGrowthPercentage(
                 parseFloat(
-                    (((data.todayTraffic - data.yesterdayTraffic) / data.yesterdayTraffic) * 100).toFixed(1)
+                    (((data.todayLogin - data.yesterdayLogin) / data.yesterdayLogin) * 100).toFixed(1)
                 )
             );
-            setTrafficData7Days(data.trafficData7Days);
+            setTrafficData7Days(data.past7DaysLogin);
         } catch (error) {
             console.error("Error fetching traffic data:", error);
         }
@@ -50,8 +42,8 @@ const TodayTraffic = () => {
 
     // 如果数据还在加载中，展示加载状态
     if (
-        todayTraffic === null ||
-        yesterdayTraffic === null ||
+        todayLogin === null ||
+        yesterdayLogin === null ||
         growthPercentage === null ||
         trafficData7Days.length === 0
     ) {
@@ -115,12 +107,12 @@ const TodayTraffic = () => {
                 </Fab>
             }
             footer={
-                <Chart options={optionscolumnchart} series={seriescolumnchart} type="area" height={60} width={"100%"} />
+                <Chart options={optionscolumnchart} series={seriescolumnchart} type="area" height={317} width={"100%"} />
             }
         >
             <>
                 <Typography variant="h3" fontWeight="700" mt="-20px">
-                    {todayTraffic} {/* 显示今日浏览量 */}
+                    {todayLogin} {/* 显示今日登录量 */}
                 </Typography>
                 <Stack direction="row" spacing={1} my={1} alignItems="center">
                     <Avatar
